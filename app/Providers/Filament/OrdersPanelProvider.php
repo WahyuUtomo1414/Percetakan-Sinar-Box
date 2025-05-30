@@ -26,10 +26,16 @@ class OrdersPanelProvider extends PanelProvider
             ->default()
             ->id('orders')
             ->path('orders')
+            ->font('poppins')
+            ->brandLogo($this->getBrandLogo())
+            ->brandLogoHeight($this->getBrandLogoHeight())
+            ->favicon(asset('images/1.jpg'))
             ->login()
+            ->registration()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
+            ->darkMode(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -38,7 +44,6 @@ class OrdersPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -54,5 +59,23 @@ class OrdersPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    protected function getBrandLogo(): ?string
+    {
+        if (request()->is('orders/login')) {
+            return asset('images/1.jpg');
+        }
+
+        return asset('images/1.jpg');
+    }
+
+    protected function getBrandLogoHeight(): string
+    {
+        if (request()->is('orders/login')) {
+            return '5rem';
+        }
+
+        return '3rem';
     }
 }
