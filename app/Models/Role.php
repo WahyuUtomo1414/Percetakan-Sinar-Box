@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Role extends Model
 {
     use HasFactory, Notifiable, SoftDeletes, AuditedBySoftDelete;
-    protected $table = 'status';
+    protected $table = 'role';
     protected $guarded = ['id'];
 
     public function statu()
