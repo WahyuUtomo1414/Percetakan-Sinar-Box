@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 128);
             $table->text('desc')->nullable();
-            $table->double('proce');
+            $table->double('price');
             $this->base($table);
         });
     }
