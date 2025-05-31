@@ -22,6 +22,11 @@ class Product extends Model
         return $this->belongsTo(Status::class, 'status_id');
     }
 
+    public function productType()
+    {
+        return $this->belongsTo(ProductType::class, 'product_type_id');
+    }
+
     // jika tidak ada, buat array kosong
     protected function mutateFormDataBeforeCreate(array $data): array
     {
