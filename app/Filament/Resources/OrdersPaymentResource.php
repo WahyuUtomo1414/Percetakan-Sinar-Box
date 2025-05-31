@@ -5,11 +5,13 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Orders;
+use App\Models\Status;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\OrdersPayment;
 use App\Models\PaymentMethod;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -34,7 +36,7 @@ class OrdersPaymentResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('orders_id')
+                Select::make('order_id')
                     ->required()
                     ->label('Orders')
                     ->columnSpanFull()
@@ -85,6 +87,8 @@ class OrdersPaymentResource extends Resource
                 Textarea::make('desc')
                     ->label('Description')
                     ->columnSpanFull(),
+                Hidden::make('status_id')
+                    ->default(1),
         ]);
     }
 
