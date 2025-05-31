@@ -32,7 +32,7 @@ class OrdersPanelProvider extends PanelProvider
             ->font('poppins')
             ->brandLogo($this->getBrandLogo())
             ->brandLogoHeight($this->getBrandLogoHeight())
-            ->favicon(asset('images/1.jpg'))
+            ->favicon(asset('images/2.jpg'))
             ->login()
             ->registration(RegisterCustom::class)
             ->colors([
