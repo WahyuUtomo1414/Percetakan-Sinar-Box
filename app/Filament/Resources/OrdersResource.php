@@ -10,13 +10,17 @@ use App\Models\Product;
 use App\Models\Shiping;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\PaymentMethod;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\OrdersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -38,7 +42,7 @@ class OrdersResource extends Resource
             ->schema([
                 Tabs::make('Tabs')
                 ->tabs([
-                    Tab::make('Informasi Umum')
+                    Tab::make('Orders')
                         ->schema([
                         Hidden::make('code')
                             ->required()
@@ -105,6 +109,29 @@ class OrdersResource extends Resource
                             ->columnSpanFull()
                             ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
                         ]),
+                    Tab::make('Orders Payment')
+                        ->schema([
+                                Select::make('orders_id')
+                                    ->required()
+                                    ->label('Orders')
+                                    ->options(Orders::all()->pluck('code', 'id'))
+                                    ->searchable(),
+                                Select::make('payment_method_id')
+                                    ->required()
+                                    ->label('Payment Method')
+                                    ->options(fn () => PaymentMethod::pluck('name', 'id')->toArray())
+                                    ->searchable(),
+                                FileUpload::make('image')
+                                    ->required()
+                                    ->label('Payment Proof')
+                                    ->preserveFilenames()
+                                    ->directory('orders-payments')
+                                    ->image()
+                                    ->columnSpanFull(),
+                                Textarea::make('desc')
+                                    ->label('Description')
+                                    ->columnSpanFull(),
+                            ])
                 ])->columnSpanFull(),
             ]);
     }

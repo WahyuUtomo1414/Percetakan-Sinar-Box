@@ -32,6 +32,11 @@ class Orders extends Model
         return $this->belongsTo(Status::class, 'status_id');
     }
 
+    public function ordersPayment()
+    {
+        return $this->hasOne(OrdersPayment::class, 'order_id');
+    }
+
     public function calculateTotalPrice(): int
     {
         $productPrice = $this->product?->price ?? 0;
