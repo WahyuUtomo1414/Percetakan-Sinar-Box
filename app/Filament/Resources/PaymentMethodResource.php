@@ -11,12 +11,14 @@ use App\Models\PaymentMethod;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PaymentMethodResource\Pages;
 use App\Filament\Resources\PaymentMethodResource\RelationManagers;
-use Filament\Forms\Components\FileUpload;
 
 class PaymentMethodResource extends Resource
 {
@@ -65,26 +67,33 @@ class PaymentMethodResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                ImageColumn::make('logo')
+                    ->label('Logo')
+                    ->size(70)
+                    ->circular(),
+                TextColumn::make('name')
+                    ->label('Payment Method Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('logo')
+                TextColumn::make('account_number')
+                    ->searchable()
+                    ->label('Account Number'),
+                TextColumn::make('account_name')
+                    ->label('Account Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('account_number')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('account_name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status_id')
-                    ->numeric()
+                TextColumn::make('payment_procedures')
+                    ->label('Payment Procedures')
+                    ->searchable()
+                    ->limit(50),
+                TextColumn::make('status.name')
+                    ->label('Status')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('updated_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_by')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('createdBy.name')
+                    ->label('Created By'),
+                TextColumn::make('updatedBy.name')
+                    ->label("Updated by"),
+                TextColumn::make('deletedBy.name')
+                    ->label("Deleted by"),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -103,6 +112,7 @@ class PaymentMethodResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
