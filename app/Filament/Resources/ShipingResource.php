@@ -2,16 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ShipingResource\Pages;
-use App\Filament\Resources\ShipingResource\RelationManagers;
-use App\Models\Shiping;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Status;
+use App\Models\Shiping;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ShipingResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ShipingResource\RelationManagers;
 
 class ShipingResource extends Resource
 {
@@ -23,25 +27,27 @@ class ShipingResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
+                    ->label('Shipping Name')
+                    ->columnSpanFull()
                     ->maxLength(128),
-                Forms\Components\Textarea::make('desc')
+                Textarea::make('desc')
+                    ->label('Description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('proce')
+                TextInput::make('proce')
                     ->required()
+                    ->label('Shipping Price')
+                    ->columnSpanFull()
+                    ->prefix('Rp.')
                     ->numeric(),
-                Forms\Components\TextInput::make('status_id')
+                Select::make('status_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
+                    ->label('Status')
+                    ->searchable()
+                    ->default(1)
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
             ]);
     }
 
