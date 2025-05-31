@@ -2,16 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrdersResource\Pages;
-use App\Filament\Resources\OrdersResource\RelationManagers;
-use App\Models\Orders;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Orders;
+use App\Models\Status;
+use App\Models\Product;
+use App\Models\Shiping;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\OrdersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrdersResource\RelationManagers;
+use Filament\Forms\Components\Hidden;
 
 class OrdersResource extends Resource
 {
@@ -23,32 +31,76 @@ class OrdersResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('shipping_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('total_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
+                Tabs::make('Tabs')
+                ->tabs([
+                    Tab::make('Informasi Umum')
+                        ->schema([
+                        Hidden::make('code')
+                            ->required()
+                            ->label('Order Code')
+                            ->disabled(fn ($context) => $context === 'edit')
+                            ->default(function ($context) {
+                                if ($context === 'create') {
+                                    $randomNumber = rand(100, 99999);
+                                    return 'ORD-' . $randomNumber . '-' . now()->format('Ymd');
+                                }
+                                return null;
+                            }),
+                        Select::make('product_id')
+                            ->required()
+                            ->label('Product')
+                            ->options(Product::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $set('total_price', app(Orders::class)->fill([
+                                    'product_id' => $get('product_id'),
+                                    'shipping_id' => $get('shipping_id'),
+                                    'quantity' => $get('quantity'),
+                                ])->calculateTotalPrice());
+                            }),
+
+                        TextInput::make('quantity')
+                            ->required()
+                            ->numeric()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $set('total_price', app(Orders::class)->fill([
+                                    'product_id' => $get('product_id'),
+                                    'shipping_id' => $get('shipping_id'),
+                                    'quantity' => $get('quantity'),
+                                ])->calculateTotalPrice());
+                            }),
+
+                        Select::make('shipping_id')
+                            ->required()
+                            ->label('Shipping')
+                            ->options(Shiping::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $set('total_price', app(Orders::class)->fill([
+                                    'product_id' => $get('product_id'),
+                                    'shipping_id' => $get('shipping_id'),
+                                    'quantity' => $get('quantity'),
+                                ])->calculateTotalPrice());
+                            }),
+
+                        TextInput::make('total_price')
+                            ->disabled()
+                            ->numeric()
+                            ->default(0)
+                            ->prefix('Rp.')
+                            ->dehydrated(),
+                        Select::make('status_id')
+                            ->required()
+                            ->label('Status')
+                            ->searchable()
+                            ->default(1)
+                            ->columnSpanFull()
+                            ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
+                        ]),
+                ])->columnSpanFull(),
             ]);
     }
 

@@ -31,4 +31,13 @@ class Orders extends Model
     {
         return $this->belongsTo(Status::class, 'status_id');
     }
+
+    public function calculateTotalPrice(): int
+    {
+        $productPrice = $this->product?->price ?? 0;
+        $shippingPrice = $this->shipping?->price ?? 0;
+        $quantity = $this->quantity ?? 0;
+
+        return ($productPrice * $quantity) + $shippingPrice;
+    }
 }
