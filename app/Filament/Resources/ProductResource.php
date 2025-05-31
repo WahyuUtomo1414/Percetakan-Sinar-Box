@@ -2,16 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Status;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\ProductType;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -23,31 +29,39 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product_type_id')
+                Select::make('product_type_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
+                    ->options(ProductType::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->columnSpanFull()
+                    ->label('Product Type'),
+                TextInput::make('name')
                     ->required()
+                    ->label('Product Name')
+                    ->columnSpanFull()
                     ->maxLength(128),
-                Forms\Components\TextInput::make('images')
+                FileUpload::make('images')
+                    ->label('Product Images')
+                    ->multiple()
+                    ->columnSpanFull()
+                    ->preserveFilenames()
+                    ->directory('products')
                     ->required(),
-                Forms\Components\Textarea::make('desc')
+                Textarea::make('desc')
+                    ->label('Description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('price')
+                TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
-                Forms\Components\TextInput::make('status_id')
+                    ->columnSpanFull()
+                    ->prefix('IDR'),
+                Select::make('status_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
+                    ->label('Status')
+                    ->searchable()
+                    ->default(1)
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
             ]);
     }
 
