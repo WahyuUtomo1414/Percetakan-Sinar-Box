@@ -11,6 +11,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ShipingResource\Pages;
@@ -35,7 +36,7 @@ class ShipingResource extends Resource
                 Textarea::make('desc')
                     ->label('Description')
                     ->columnSpanFull(),
-                TextInput::make('proce')
+                TextInput::make('price')
                     ->required()
                     ->label('Shipping Price')
                     ->columnSpanFull()
@@ -55,23 +56,26 @@ class ShipingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('proce')
+                TextColumn::make('desc')
+                    ->label('Description')
+                    ->limit(50),
+                TextColumn::make('price')
+                    ->label('Price')
+                    ->prefix('Rp.')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status_id')
-                    ->numeric()
+                TextColumn::make('status.name')
+                    ->label('Status')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('updated_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_by')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('createdBy.name')
+                    ->label('Created By'),
+                TextColumn::make('updatedBy.name')
+                    ->label("Updated by"),
+                TextColumn::make('deletedBy.name')
+                    ->label("Deleted by"),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -90,6 +94,7 @@ class ShipingResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
