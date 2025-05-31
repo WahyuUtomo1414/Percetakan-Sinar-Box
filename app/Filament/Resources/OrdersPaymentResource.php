@@ -2,16 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrdersPaymentResource\Pages;
-use App\Filament\Resources\OrdersPaymentResource\RelationManagers;
-use App\Models\OrdersPayment;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Orders;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\OrdersPayment;
+use App\Models\PaymentMethod;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrdersPaymentResource\Pages;
+use App\Filament\Resources\OrdersPaymentResource\RelationManagers;
 
 class OrdersPaymentResource extends Resource
 {
@@ -23,29 +30,58 @@ class OrdersPaymentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('order_id')
+                Select::make('orders_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('payment_method_id')
+                    ->label('Orders')
+                    ->columnSpanFull()
+                    ->options(Orders::all()->pluck('code', 'id'))
+                    ->searchable(),
+                Section::make('Payment Details')
+                    ->description('Select a payment method to auto-fill account details.')
+                    ->icon('heroicon-o-credit-card')
+                    ->schema([
+                        Select::make('payment_method_id')
+                            ->required()
+                            ->label('Payment Method')
+                            ->options(fn () => PaymentMethod::pluck('name', 'id')->toArray())
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if ($state) {
+                                    $paymentMethod = PaymentMethod::find($state);
+                                    if ($paymentMethod) {
+                                        $set('account_number', $paymentMethod->account_number);
+                                        $set('account_name', $paymentMethod->account_name);
+                                        $set('payment_procedures', $paymentMethod->payment_procedures);
+                                    }
+                                } else {
+                                    $set('account_number', null);
+                                    $set('account_name', null);
+                                    $set('payment_procedures', null);
+                                }
+                            }),
+                        TextInput::make('account_number')
+                            ->label('Account Number'),
+                        TextInput::make('account_name')
+                            ->disabled()
+                            ->label('Account Name'),
+                        Textarea::make('payment_procedures')
+                            ->label('Payment Procedures')
+                            ->disabled()
+                            ->rows(10)
+                            ->columnSpanFull(),
+                    ]),
+                FileUpload::make('image')
                     ->required()
-                    ->numeric(),
-                Forms\Components\FileUpload::make('image')
+                    ->label('Payment Proof Image')
+                    ->preserveFilenames()
+                    ->columnSpanFull()
+                    ->directory('orders-payments')
                     ->image()
-                    ->required(),
-                Forms\Components\TextInput::make('desc')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('status_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
-            ]);
+                    ->columnSpanFull(),
+                Textarea::make('desc')
+                    ->label('Description')
+                    ->columnSpanFull(),
+        ]);
     }
 
     public static function table(Table $table): Table
