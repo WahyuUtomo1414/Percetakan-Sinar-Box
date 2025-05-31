@@ -41,127 +41,73 @@ class OrdersResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make('Tabs')
-                ->tabs([
-                    Tab::make('Orders')
-                        ->schema([
-                        Hidden::make('code')
-                            ->required()
-                            ->label('Order Code')
-                            ->disabled(fn ($context) => $context === 'edit')
-                            ->default(function ($context) {
-                                if ($context === 'create') {
-                                    $randomNumber = rand(100, 99999);
-                                    return 'ORD-' . $randomNumber . '-' . now()->format('Ymd');
-                                }
-                                return null;
-                            }),
-                        Select::make('product_id')
-                            ->required()
-                            ->label('Product')
-                            ->options(Product::all()->pluck('name', 'id'))
-                            ->searchable()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $set('total_price', app(Orders::class)->fill([
-                                    'product_id' => $get('product_id'),
-                                    'shipping_id' => $get('shipping_id'),
-                                    'quantity' => $get('quantity'),
-                                ])->calculateTotalPrice());
-                            }),
+                Hidden::make('code')
+                    ->required()
+                    ->label('Order Code')
+                    ->disabled(fn ($context) => $context === 'edit')
+                    ->default(function ($context) {
+                        if ($context === 'create') {
+                            $randomNumber = rand(100, 99999);
+                            return 'ORD-' . $randomNumber . '-' . now()->format('Ymd');
+                        }
+                        return null;
+                    }),
+                Select::make('product_id')
+                    ->required()
+                    ->label('Product')
+                    ->options(Product::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->reactive()
+                    ->columnSpanFull()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $set('total_price', app(Orders::class)->fill([
+                            'product_id' => $get('product_id'),
+                            'shipping_id' => $get('shipping_id'),
+                            'quantity' => $get('quantity'),
+                        ])->calculateTotalPrice());
+                    }),
 
-                        TextInput::make('quantity')
-                            ->required()
-                            ->numeric()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $set('total_price', app(Orders::class)->fill([
-                                    'product_id' => $get('product_id'),
-                                    'shipping_id' => $get('shipping_id'),
-                                    'quantity' => $get('quantity'),
-                                ])->calculateTotalPrice());
-                            }),
+                TextInput::make('quantity')
+                    ->required()
+                    ->numeric()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $set('total_price', app(Orders::class)->fill([
+                            'product_id' => $get('product_id'),
+                            'shipping_id' => $get('shipping_id'),
+                            'quantity' => $get('quantity'),
+                        ])->calculateTotalPrice());
+                    }),
 
-                        Select::make('shipping_id')
-                            ->required()
-                            ->label('Shipping')
-                            ->options(Shiping::all()->pluck('name', 'id'))
-                            ->searchable()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $set('total_price', app(Orders::class)->fill([
-                                    'product_id' => $get('product_id'),
-                                    'shipping_id' => $get('shipping_id'),
-                                    'quantity' => $get('quantity'),
-                                ])->calculateTotalPrice());
-                            }),
+                Select::make('shipping_id')
+                    ->required()
+                    ->label('Shipping')
+                    ->options(Shiping::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $set('total_price', app(Orders::class)->fill([
+                            'product_id' => $get('product_id'),
+                            'shipping_id' => $get('shipping_id'),
+                            'quantity' => $get('quantity'),
+                        ])->calculateTotalPrice());
+                    }),
 
-                        TextInput::make('total_price')
-                            ->disabled()
-                            ->numeric()
-                            ->default(0)
-                            ->prefix('Rp.')
-                            ->dehydrated(),
-                        Select::make('status_id')
-                            ->required()
-                            ->label('Status')
-                            ->searchable()
-                            ->default(1)
-                            ->columnSpanFull()
-                            ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
-                        ]),
-                    Tab::make('Orders Payment')
-                        ->schema([
-                                Select::make('orders_id')
-                                    ->required()
-                                    ->label('Orders')
-                                    ->options(Orders::all()->pluck('code', 'id'))
-                                    ->searchable(),
-                                Select::make('payment_method_id')
-                                    ->required()
-                                    ->label('Payment Method')
-                                    ->options(fn () => PaymentMethod::pluck('name', 'id')->toArray())
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        if ($state) {
-                                            $paymentMethod = PaymentMethod::find($state);
-                                            if ($paymentMethod) {
-                                                $set('account_number', $paymentMethod->account_number);
-                                                $set('account_name', $paymentMethod->account_name);
-                                                $set('payment_procedures', $paymentMethod->payment_procedures);
-                                            }
-                                        } else {
-                                            $set('account_number', null);
-                                            $set('account_name', null);
-                                            $set('payment_procedures', null);
-                                        }
-                                    }),
-                                Section::make('Payment Details')
-                                    ->schema([
-                                        TextInput::make('account_number')
-                                            ->label('Account Number'),
-                                        TextInput::make('account_name')
-                                            ->disabled()
-                                            ->label('Account Name'),
-                                        Textarea::make('payment_procedures')
-                                            ->label('Payment Procedures')
-                                            ->disabled()
-                                            ->rows(10)
-                                            ->columnSpanFull(),
-                                    ]),
-                                FileUpload::make('image')
-                                    ->required()
-                                    ->label('Payment Proof Image')
-                                    ->preserveFilenames()
-                                    ->directory('orders-payments')
-                                    ->image()
-                                    ->columnSpanFull(),
-                                Textarea::make('desc')
-                                    ->label('Description')
-                                    ->columnSpanFull(),
-                            ])
-                ])->columnSpanFull(),
-            ]);
+                TextInput::make('total_price')
+                    ->disabled()
+                    ->numeric()
+                    ->default(0)
+                    ->columnSpanFull()
+                    ->prefix('Rp.')
+                    ->dehydrated(),
+                Select::make('status_id')
+                    ->required()
+                    ->label('Status')
+                    ->searchable()
+                    ->default(1)
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
+                ]);
     }
 
     public static function table(Table $table): Table
