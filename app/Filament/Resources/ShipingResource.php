@@ -22,7 +22,11 @@ class ShipingResource extends Resource
 {
     protected static ?string $model = Shiping::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
+
+    protected static ?string $navigationGroup = 'Order Setting';
+
+    protected static ?string $navigationLabel = 'Shipping';
 
     public static function form(Form $form): Form
     {
