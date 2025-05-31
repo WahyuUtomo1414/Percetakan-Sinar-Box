@@ -24,7 +24,11 @@ class OrdersPaymentResource extends Resource
 {
     protected static ?string $model = OrdersPayment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+
+    protected static ?string $navigationGroup = 'Order Management';
+
+    protected static ?string $navigationLabel = 'Orders Payments';
 
     public static function form(Form $form): Form
     {
