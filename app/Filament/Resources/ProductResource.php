@@ -87,7 +87,9 @@ class ProductResource extends Resource
                     ->limit(50)
                     ->label('Description'),
                 TextColumn::make('price')
-                    ->money('IDR')
+                    ->label('Price')
+                    ->prefix('Rp.')
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('status.name'),
                 TextColumn::make('createdBy.name')
