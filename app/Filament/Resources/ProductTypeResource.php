@@ -2,16 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductTypeResource\Pages;
-use App\Filament\Resources\ProductTypeResource\RelationManagers;
-use App\Models\ProductType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Status;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\ProductType;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductTypeResource\Pages;
+use App\Filament\Resources\ProductTypeResource\RelationManagers;
+use Filament\Forms\Components\Textarea;
 
 class ProductTypeResource extends Resource
 {
@@ -23,22 +27,22 @@ class ProductTypeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
+                    ->label('Product Type Name')
+                    ->columnSpanFull()
                     ->maxLength(128),
-                Forms\Components\TextInput::make('desc')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('status_id')
+                Textarea::make('desc')
+                    ->maxLength(255)
+                    ->label('Description')
+                    ->columnSpanFull(),
+                Select::make('status_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
+                    ->label('Status')
+                    ->searchable()
+                    ->default(1)
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
             ]);
     }
 
