@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\RegisterCustom;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,7 +32,7 @@ class OrdersPanelProvider extends PanelProvider
             ->brandLogoHeight($this->getBrandLogoHeight())
             ->favicon(asset('images/1.jpg'))
             ->login()
-            ->registration()
+            ->registration(RegisterCustom::class)
             ->colors([
                 'primary' => Color::Blue,
             ])
