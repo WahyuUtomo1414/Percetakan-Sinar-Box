@@ -12,14 +12,15 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\OrdersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\OrdersResource\RelationManagers;
-use Filament\Forms\Components\Hidden;
 
 class OrdersResource extends Resource
 {
@@ -108,32 +109,32 @@ class OrdersResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product_id')
+                TextColumn::make('code')
+                    ->searchable()
+                    ->color('primary'),
+                TextColumn::make('product.name')
+                    ->label('Product')  
+                    ->sortable(),
+                TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('shipping_id')
-                    ->numeric()
+                TextColumn::make('shipping.name')
+                    ->label('Shipping')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('code')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('quantity')
-                    ->numeric()
+                TextColumn::make('total_price')
+                    ->label('Total Price')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => 'Rp. ' . number_format($state, 0, ',', '.')),
+                TextColumn::make('status.name')
+                    ->label('Status')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('total_price')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('updated_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_by')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('createdBy.name')
+                    ->label('Created By'),
+                TextColumn::make('updatedBy.name')
+                    ->label("Updated by"),
+                TextColumn::make('deletedBy.name')
+                    ->label("Deleted by"),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -151,7 +152,9 @@ class OrdersResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
