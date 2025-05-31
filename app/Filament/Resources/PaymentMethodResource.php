@@ -2,16 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PaymentMethodResource\Pages;
-use App\Filament\Resources\PaymentMethodResource\RelationManagers;
-use App\Models\PaymentMethod;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Status;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\PaymentMethod;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PaymentMethodResource\Pages;
+use App\Filament\Resources\PaymentMethodResource\RelationManagers;
+use Filament\Forms\Components\FileUpload;
 
 class PaymentMethodResource extends Resource
 {
@@ -23,31 +28,36 @@ class PaymentMethodResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
+                    ->label('Payment Method Name')
                     ->required()
-                    ->maxLength(64),
-                Forms\Components\TextInput::make('logo')
-                    ->required()
-                    ->maxLength(128),
-                Forms\Components\TextInput::make('account_number')
-                    ->required()
-                    ->maxLength(32),
-                Forms\Components\TextInput::make('account_name')
-                    ->required()
-                    ->maxLength(128),
-                Forms\Components\Textarea::make('payment_procedures')
+                    ->maxLength(64)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('status_id')
+                FileUpload::make('logo')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
+                    ->label('Logo')
+                    ->columnSpanFull()
+                    ->preserveFilenames()
+                    ->directory('payment-methods')
+                    ->image(),
+                TextInput::make('account_number')
                     ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
+                    ->label('Account Number')
+                    ->maxLength(32),
+                TextInput::make('account_name')
+                    ->required()
+                    ->label('Account Name')
+                    ->maxLength(128),
+                Textarea::make('payment_procedures')
+                    ->label('Payment Procedures')
+                    ->columnSpanFull(),
+                Select::make('status_id')
+                    ->required()
+                    ->label('Status')
+                    ->searchable()
+                    ->default(1)
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
             ]);
     }
 
