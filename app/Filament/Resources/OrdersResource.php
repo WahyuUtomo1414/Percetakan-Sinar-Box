@@ -21,6 +21,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\OrdersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -120,10 +121,37 @@ class OrdersResource extends Resource
                                     ->required()
                                     ->label('Payment Method')
                                     ->options(fn () => PaymentMethod::pluck('name', 'id')->toArray())
-                                    ->searchable(),
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            $paymentMethod = PaymentMethod::find($state);
+                                            if ($paymentMethod) {
+                                                $set('account_number', $paymentMethod->account_number);
+                                                $set('account_name', $paymentMethod->account_name);
+                                                $set('payment_procedures', $paymentMethod->payment_procedures);
+                                            }
+                                        } else {
+                                            $set('account_number', null);
+                                            $set('account_name', null);
+                                            $set('payment_procedures', null);
+                                        }
+                                    }),
+                                Section::make('Payment Details')
+                                    ->schema([
+                                        TextInput::make('account_number')
+                                            ->label('Account Number'),
+                                        TextInput::make('account_name')
+                                            ->disabled()
+                                            ->label('Account Name'),
+                                        Textarea::make('payment_procedures')
+                                            ->label('Payment Procedures')
+                                            ->disabled()
+                                            ->rows(10)
+                                            ->columnSpanFull(),
+                                    ]),
                                 FileUpload::make('image')
                                     ->required()
-                                    ->label('Payment Proof')
+                                    ->label('Payment Proof Image')
                                     ->preserveFilenames()
                                     ->directory('orders-payments')
                                     ->image()
