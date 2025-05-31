@@ -42,7 +42,7 @@ class OrdersPaymentResource extends Resource
                     ->required()
                     ->label('Orders')
                     ->columnSpanFull()
-                    ->options(Orders::all()->pluck('code', 'id'))
+                    ->options(Orders::where('created_by', auth()->id())->pluck('code', 'id'))
                     ->searchable(),
                 Section::make('Payment Details')
                     ->description('Select a payment method to auto-fill account details.')
