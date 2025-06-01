@@ -104,9 +104,13 @@ class OrdersResource extends Resource
                     ->required()
                     ->label('Status')
                     ->searchable()
-                    ->default(1)
+                    ->default('PENDING')
+                    ->disabled(function () {
+                        $user = auth()->user();
+                        return $user && $user->role_id == 2;
+                    })
                     ->columnSpanFull()
-                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
+                    ->options(Status::where('status_type_id', 3)->pluck('name', 'id')),
                 ]);
     }
 
