@@ -115,6 +115,10 @@ class OrdersPaymentResource extends Resource
                 TextColumn::make('order.code')
                     ->label('Order Code')
                     ->sortable(),
+                TextColumn::make('order.createdBy.name')
+                    ->label('Customer Name')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('paymentMethod.name')
                     ->label('Payment Method')
                     ->sortable(),
@@ -128,11 +132,14 @@ class OrdersPaymentResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('createdBy.name')
-                    ->label('Created By'),
+                    ->label('Created By')
+                    ->visible(fn () => Auth::user()->role_id === 1),,
                 TextColumn::make('updatedBy.name')
-                    ->label("Updated by"),
+                    ->label("Updated by")
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('deletedBy.name')
-                    ->label("Deleted by"),
+                    ->label("Deleted by")
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
