@@ -110,10 +110,6 @@ class OrdersResource extends Resource
                             ->where('name', 'PENDING')
                             ->value('id');
                     })
-                    ->disabled(function () {
-                        $user = auth()->user();
-                        return $user && $user->role_id == 2;
-                    })
                     ->columnSpanFull()
                     ->options(Status::where('status_type_id', 3)->pluck('name', 'id')),
                 ]);
@@ -205,19 +201,5 @@ class OrdersResource extends Resource
             'create' => Pages\CreateOrders::route('/create'),
             'edit' => Pages\EditOrders::route('/{record}/edit'),
         ];
-    }
-
-    // method untuk memfilter data berdasarkan user yang sedang login
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
-
-        if (Auth::check() && Auth::user()->role_id == 2) {
-            // Jika role_id = 2, hanya tampilkan data user yang sedang login
-            $query->where('id', Auth::id());
-        }
-        // Jika role_id = 1, tampilkan semua data
-
-        return $query;
     }
 }

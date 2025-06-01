@@ -43,7 +43,7 @@ class OrdersPaymentResource extends Resource
                     ->required()
                     ->label('Orders')
                     ->columnSpanFull()
-                    ->options(Orders::where('created_by', auth()->id())->pluck('code', 'id'))
+                    ->options(Orders::all()->pluck('code', 'id'))
                     ->searchable(),
                 Section::make('Payment Details')
                     ->description('Select a payment method to auto-fill account details.')
@@ -98,10 +98,6 @@ class OrdersPaymentResource extends Resource
                         return Status::where('status_type_id', 4)
                             ->where('name', 'pending')
                             ->value('id');
-                    })
-                    ->disabled(function () {
-                        $user = auth()->user();
-                        return $user && $user->role_id == 2;
                     })
                     ->columnSpanFull()
                     ->options(Status::where('status_type_id', 4)->pluck('name', 'id')),
@@ -182,19 +178,5 @@ class OrdersPaymentResource extends Resource
             'create' => Pages\CreateOrdersPayment::route('/create'),
             'edit' => Pages\EditOrdersPayment::route('/{record}/edit'),
         ];
-    }
-
-    // method untuk memfilter data berdasarkan user yang sedang login
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
-
-        if (Auth::check() && Auth::user()->role_id == 2) {
-            // Jika role_id = 2, hanya tampilkan data user yang sedang login
-            $query->where('id', Auth::id());
-        }
-        // Jika role_id = 1, tampilkan semua data
-
-        return $query;
     }
 }

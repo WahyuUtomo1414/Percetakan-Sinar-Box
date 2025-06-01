@@ -38,7 +38,7 @@ class OrdersPaymentPolicy
      */
     public function update(User $user, OrdersPayment $ordersPeyment): bool
     {
-        return $user->role_id === 1;
+        return true;
     }
 
     /**
