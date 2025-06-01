@@ -89,8 +89,21 @@ class OrdersPaymentResource extends Resource
                 Textarea::make('desc')
                     ->label('Description')
                     ->columnSpanFull(),
-                Hidden::make('status_id')
-                    ->default(1),
+                Select::make('status_id')
+                    ->required()
+                    ->label('Status')
+                    ->searchable()
+                    ->default(function () {
+                        return Status::where('status_type_id', 4)
+                            ->where('name', 'pending')
+                            ->value('id');
+                    })
+                    ->disabled(function () {
+                        $user = auth()->user();
+                        return $user && $user->role_id == 2;
+                    })
+                    ->columnSpanFull()
+                    ->options(Status::where('status_type_id', 4)->pluck('name', 'id')),
         ]);
     }
 

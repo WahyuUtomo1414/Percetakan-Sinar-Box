@@ -104,7 +104,11 @@ class OrdersResource extends Resource
                     ->required()
                     ->label('Status')
                     ->searchable()
-                    ->default('PENDING')
+                    ->default(function () {
+                        return Status::where('status_type_id', 3)
+                            ->where('name', 'PENDING')
+                            ->value('id');
+                    })
                     ->disabled(function () {
                         $user = auth()->user();
                         return $user && $user->role_id == 2;
