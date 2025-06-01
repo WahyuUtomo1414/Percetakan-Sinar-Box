@@ -68,7 +68,7 @@ class ProductResource extends Resource
                     ->searchable()
                     ->default(1)
                     ->columnSpanFull()
-                    ->options(Status::where('status_type_id', 1)->pluck('name', 'id')),
+                    ->options(Status::where('status_type_id', 2)->pluck('name', 'id')),
             ]);
     }
 
