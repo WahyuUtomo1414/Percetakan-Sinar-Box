@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait AuditedBySoftDelete
 {
-    public static function bootAuditedBy()
+    public static function bootAuditedBySoftDelete()
     {
         static::creating(function ($model) {
             if (!$model->isDirty('created_by')) {
