@@ -13,15 +13,16 @@ use Filament\Tables\Table;
 use App\Models\PaymentMethod;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Tabs;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\OrdersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -194,11 +195,17 @@ class OrdersResource extends Resource
         ];
     }
 
+    // method untuk memfilter data berdasarkan user yang sedang login
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        $query = parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
+
+        if (Auth::check() && Auth::user()->role_id == 2) {
+            // Jika role_id = 2, hanya tampilkan data user yang sedang login
+            $query->where('id', Auth::id());
+        }
+        // Jika role_id = 1, tampilkan semua data
+
+        return $query;
     }
 }
