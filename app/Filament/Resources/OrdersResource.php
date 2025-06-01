@@ -126,6 +126,10 @@ class OrdersResource extends Resource
                 TextColumn::make('code')
                     ->searchable()
                     ->color('primary'),
+                TextColumn::make('createdBy.name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('product.name')
                     ->label('Product')  
                     ->sortable(),
@@ -144,7 +148,8 @@ class OrdersResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('createdBy.name')
-                    ->label('Created By'),
+                    ->label('Created By')
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('updatedBy.name')
                     ->label("Updated by"),
                 TextColumn::make('deletedBy.name')

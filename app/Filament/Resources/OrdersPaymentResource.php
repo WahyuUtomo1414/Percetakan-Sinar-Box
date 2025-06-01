@@ -133,13 +133,11 @@ class OrdersPaymentResource extends Resource
                     ->sortable(),
                 TextColumn::make('createdBy.name')
                     ->label('Created By')
-                    ->visible(fn () => Auth::user()->role_id === 1),,
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('updatedBy.name')
-                    ->label("Updated by")
-                    ->visible(fn () => Auth::user()->role_id === 1),
+                    ->label("Updated by"),
                 TextColumn::make('deletedBy.name')
-                    ->label("Deleted by")
-                    ->visible(fn () => Auth::user()->role_id === 1),
+                    ->label("Deleted by"),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
