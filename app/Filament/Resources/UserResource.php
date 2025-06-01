@@ -10,6 +10,7 @@ use App\Models\Status;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
@@ -147,11 +148,17 @@ class UserResource extends Resource
         ];
     }
 
+    // method untuk memfilter data berdasarkan user yang sedang login
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        $query = parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
+
+        if (Auth::check() && Auth::user()->role_id == 2) {
+            // Jika role_id = 2, hanya tampilkan data user yang sedang login
+            $query->where('id', Auth::id());
+        }
+        // Jika role_id = 1, tampilkan semua data
+
+        return $query;
     }
 }
