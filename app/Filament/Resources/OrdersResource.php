@@ -130,6 +130,16 @@ class OrdersResource extends Resource
                     ->label('Customer')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('createdBy.phone_number')
+                    ->label('WhatsApp / Phone Number')
+                    ->formatStateUsing(function ($state) {
+                        // Ubah 08xxxx menjadi 628xxxx
+                        return preg_replace('/^0/', '62', $state);
+                    })
+                    ->url(fn ($state) => 'https://wa.me/' . preg_replace('/^0/', '62', $state), true)
+                    ->color('info')
+                    ->openUrlInNewTab()
+                    ->searchable(),
                 TextColumn::make('product.name')
                     ->label('Product')  
                     ->sortable(),
@@ -147,9 +157,6 @@ class OrdersResource extends Resource
                     ->label('Status')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('createdBy.name')
-                    ->label('Created By')
-                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('updatedBy.name')
                     ->label("Updated by"),
                 TextColumn::make('deletedBy.name')
