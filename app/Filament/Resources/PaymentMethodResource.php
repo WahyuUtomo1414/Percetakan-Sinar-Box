@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\PaymentMethod;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
@@ -93,11 +94,14 @@ class PaymentMethodResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('createdBy.name')
-                    ->label('Created By'),
+                    ->label('Created By')
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('updatedBy.name')
-                    ->label("Updated by"),
+                    ->label("Updated by")
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 TextColumn::make('deletedBy.name')
-                    ->label("Deleted by"),
+                    ->label("Deleted by")
+                    ->visible(fn () => Auth::user()->role_id === 1),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
